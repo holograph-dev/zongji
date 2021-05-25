@@ -2,10 +2,10 @@
 const ZongJi = require('./');
 
 const zongji = new ZongJi({
-  host     : 'localhost',
-  user     : 'zongji',
-  password : 'zongji',
-  // debug: true
+	host     : 'localhost',
+	user     : 'zongji',
+	password : 'zongji',
+	// debug: true
 });
 
 zongji.on('binlog', function(evt) {
