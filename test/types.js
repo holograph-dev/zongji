@@ -215,8 +215,8 @@ defineTypeTest('blob', [
 defineTypeTest('geometry', [
   'GEOMETRY',
 ], [
-  ["GeomFromText('POINT(1 1)')"],
-  ["GeomFromText('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7, 5 5))')"]
+  ["ST_GeomFromText('POINT(1 1)')"],
+  ["ST_GeomFromText('POLYGON((0 0,10 0,10 10,0 10,0 0),(5 5,7 5,7 7,5 7, 5 5))')"]
 ]);
 
 defineTypeTest('time_no_fraction', [
