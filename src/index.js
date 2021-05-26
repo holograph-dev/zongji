@@ -3,9 +3,6 @@ const util = require('util');
 const EventEmitter = require('events').EventEmitter;
 const initBinlogClass = require('./lib/sequence/binlog');
 
-const ConnectionConfigMap = {
-	'Connection': obj => obj.config,
-	'Pool': obj => obj.config.connectionConfig,
 const query = (conn, sql) => {
 	return new Promise(
 		(resolve, reject) => {
@@ -37,43 +34,14 @@ function ZongJi(dsn) {
 	this.ready = false;
 	this.useChecksum = false;
 
-	this._establishConnection(dsn);
+	this.ctrlConnection = mysql.createPool({ connectionLimit: 2, ...dsn });
+	this.ctrlConnection.on('error', this.emit.bind(this, 'error'));
+
+	this.connection = mysql.createConnection(dsn);
+	this.connection.on('error', this.emit.bind(this, 'error'));
 }
 
 util.inherits(ZongJi, EventEmitter);
-
-// dsn - can be one instance of Connection or Pool / object / url string
-ZongJi.prototype._establishConnection = function(dsn) {
-	const createConnection = (options) => {
-		let connection = mysql.createConnection(options);
-		connection.on('error', this.emit.bind(this, 'error'));
-		connection.on('unhandledError', this.emit.bind(this, 'error'));
-		// don't need to call connection.connect() here
-		// we use implicitly established connection
-		// see https://github.com/mysqljs/mysql#establishing-connections
-		return connection;
-	};
-
-	const configFunc = ConnectionConfigMap[dsn.constructor.name];
-	let binlogDsn;
-
-	if (typeof dsn === 'object' && configFunc) {
-		// dsn is a pool or connection object
-		let conn = dsn; // reuse as ctrlConnection
-		this.ctrlConnection = conn;
-		this.ctrlConnectionOwner = false;
-		binlogDsn = Object.assign({}, configFunc(conn));
-	}
-
-	if (!binlogDsn) {
-		// assuming that the object passed is the connection settings
-		this.ctrlConnectionOwner = true;
-		this.ctrlConnection = createConnection(dsn);
-		binlogDsn = dsn;
-	}
-
-	this.connection = createConnection(binlogDsn);
-};
 
 ZongJi.prototype._isChecksumEnabled = function(next) {
 	const SelectChecksumParamSql = 'select @@GLOBAL.binlog_checksum as checksum';
@@ -302,10 +270,9 @@ ZongJi.prototype.stop = function() {
 	this.ctrlConnection.query(
 		'KILL ' + this.connection.threadId,
 		() => {
-			if (this.ctrlConnectionOwner) {
-				this.ctrlConnection.destroy();
-			}
-			this.emit('stopped');
+			this.ctrlConnection.end(() => {
+				this.emit('stopped');
+			});
 		}
 	);
 };

@@ -63,35 +63,6 @@ tap.test('Disconnect binlog connection', test => {
 	});
 });
 
-tap.test('Disconnect control connection', test => {
-	const zongji = new ZongJi(settings.connection);
-
-	zongji.start({
-		includeEvents: ['tablemap', 'writerows', 'updaterows', 'deleterows'],
-		serverId: testDb.serverId(),
-	});
-
-	zongji.on('ready', () => {
-		let threadId = zongji.ctrlConnection.threadId;
-		test.ok(!isNaN(threadId));
-		testDb.execute([`kill ${threadId}`], err => {
-			if (err) {
-				test.threw(err);
-			}
-		});
-	});
-
-	zongji.on('error', err => {
-		if (ACCEPTABLE_ERRORS.indexOf(err.code) > -1) {
-			zongji.stop();
-			test.end();
-		} else {
-			test.threw(err);
-		}
-	});
-});
-
-
 tap.test('Events come through in sequence', test => {
 	const NEW_INST_TIMEOUT = 1000;
 	const UPDATE_INTERVAL = 300;

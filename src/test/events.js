@@ -130,22 +130,6 @@ tap.test('Class constructor', test => {
 		});
 	}
 
-	const mysql = require('mysql');
-
-	test.test('pass a mysql connection instance', test => {
-		const conn = mysql.createConnection(settings.connection);
-		const zongji = new ZongJi(conn);
-		zongji.on('stopped', () => conn.destroy());
-		run(test, zongji);
-	});
-
-	test.test('pass a mysql pool', test => {
-		const pool = mysql.createConnection(settings.connection);
-		const zongji = new ZongJi(pool);
-		zongji.on('stopped', () => pool.end());
-		run(test, zongji);
-	});
-
 	test.end();
 });
 
