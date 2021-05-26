@@ -8,8 +8,8 @@ const settings = require('./settings/mysql');
 const checkTableMatches = function(tableName) {
 	return function(test, event) {
 		const tableDetails = event.tableMap[event.tableId];
-		test.strictEqual(tableDetails.parentSchema, testDb.SCHEMA_NAME);
-		test.strictEqual(tableDetails.tableName, tableName);
+		test.equal(tableDetails.parentSchema, testDb.SCHEMA_NAME);
+		test.equal(tableDetails.tableName, tableName);
 	};
 };
 
@@ -52,7 +52,7 @@ tap.test('Binlog option startAtEnd', test => {
 		const events = [];
 
 		const zongji = new ZongJi(settings.connection);
-		test.tearDown(() => zongji.stop());
+		test.teardown(() => zongji.stop());
 
 		zongji.on('binlog', evt => events.push(evt));
 		zongji.start({
@@ -103,7 +103,7 @@ tap.test('Class constructor', test => {
 	});
 
 	function run(test, zongji) {
-		test.tearDown(() => zongji.stop());
+		test.teardown(() => zongji.stop());
 
 		const events = [];
 		zongji.on('binlog', evt => events.push(evt));
@@ -168,7 +168,7 @@ tap.test('Write events', test => {
 	test.test('write a record', test => {
 		const events = [];
 		const zongji = new ZongJi(settings.connection);
-		test.tearDown(() => zongji.stop());
+		test.teardown(() => zongji.stop());
 
 		zongji.start({
 			startAtEnd: true,
@@ -208,7 +208,7 @@ tap.test('Write events', test => {
 	test.test('update a record', test => {
 		const events = [];
 		const zongji = new ZongJi(settings.connection);
-		test.tearDown(() => zongji.stop());
+		test.teardown(() => zongji.stop());
 
 		zongji.start({
 			startAtEnd: true,
@@ -248,7 +248,7 @@ tap.test('Write events', test => {
 	test.test('delete a record', test => {
 		const events = [];
 		const zongji = new ZongJi(settings.connection);
-		test.tearDown(() => zongji.stop());
+		test.teardown(() => zongji.stop());
 
 		zongji.start({
 			startAtEnd: true,
@@ -307,7 +307,7 @@ tap.test('Intvar / Query event', test => {
 	test.test('begin', test => {
 		const events = [];
 		const zongji = new ZongJi(settings.connection);
-		test.tearDown(() => zongji.stop());
+		test.teardown(() => zongji.stop());
 
 		zongji.on('binlog', event => {
 			if (event.getTypeName() === 'Query' && event.query === 'BEGIN') {
@@ -360,7 +360,7 @@ tap.test('With many columns', test => {
 
 	const zongji = new ZongJi(settings.connection);
 
-	test.tearDown(() => zongji.stop());
+	test.teardown(() => zongji.stop());
 	zongji.on('binlog', evt => events.push(evt));
 	zongji.start({
 		startAtEnd: true,
