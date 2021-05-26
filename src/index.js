@@ -6,12 +6,25 @@ const initBinlogClass = require('./lib/sequence/binlog');
 const ConnectionConfigMap = {
 	'Connection': obj => obj.config,
 	'Pool': obj => obj.config.connectionConfig,
+const query = (conn, sql) => {
+	return new Promise(
+		(resolve, reject) => {
+			conn.query(sql, (err, result) => {
+				if (err) {
+					reject(err);
+				}
+				else {
+					resolve(result);
+				}
+			});
+		}
+	);
 };
 
 const TableInfoQueryTemplate = 'SELECT ' +
 	'COLUMN_NAME, COLLATION_NAME, CHARACTER_SET_NAME, ' +
 	'COLUMN_COMMENT, COLUMN_TYPE ' +
-	'FROM information_schema.columns ' + "WHERE table_schema='%s' AND table_name='%s'" +
+	'FROM information_schema.columns ' + "WHERE table_schema='%s' AND table_name='%s' "
 	'ORDER BY ORDINAL_POSITION;';
 
 function ZongJi(dsn) {
@@ -65,21 +78,6 @@ ZongJi.prototype._establishConnection = function(dsn) {
 ZongJi.prototype._isChecksumEnabled = function(next) {
 	const SelectChecksumParamSql = 'select @@GLOBAL.binlog_checksum as checksum';
 	const SetChecksumSql = 'set @master_binlog_checksum=@@global.binlog_checksum';
-
-	const query = (conn, sql) => {
-		return new Promise(
-			(resolve, reject) => {
-				conn.query(sql, (err, result) => {
-					if (err) {
-						reject(err);
-					}
-					else {
-						resolve(result);
-					}
-				});
-			}
-		);
-	};
 
 	let checksumEnabled = true;
 
