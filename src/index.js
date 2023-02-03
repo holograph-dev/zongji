@@ -24,13 +24,13 @@ const TableInfoQueryTemplate = 'SELECT ' +
 	'FROM information_schema.columns ' + "WHERE table_schema='%s' AND table_name='%s' " +
 	'ORDER BY ORDINAL_POSITION;';
 
-function ZongJi(dsn) {
+function ZongJi(dsn, { tableMap } = {}) {
 	EventEmitter.call(this);
 
 	this._options({});
 	this._filters({});
 	this.ctrlCallbacks = [];
-	this.tableMap = {};
+	this.tableMap = tableMap || {};
 	this.ready = false;
 	this.useChecksum = false;
 
