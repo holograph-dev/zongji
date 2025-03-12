@@ -26,6 +26,7 @@ module.exports = function initBinlogPacketClass(zongji) {
 				timestamp: timestamp,
 				nextPosition: nextPosition,
 				size: eventLength - BinlogPacket.Length,
+				eventSize: eventLength,
 				eventType: eventType,
 			};
 

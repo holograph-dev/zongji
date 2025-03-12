@@ -7,6 +7,7 @@ function BinlogEvent(parser, options) {
 	this.timestamp = options.timestamp;
 	this.nextPosition = options.nextPosition;
 	this.size = options.size;
+	this.eventSize = options.eventSize;
 }
 
 BinlogEvent.prototype.getEventName = function() {
